@@ -119,7 +119,7 @@ namespace filtermodule
                 {
                     pipeMessage.Properties.Add(prop.Key, prop.Value);
                 }
-                pipeMessage.Properties.Add("VSTSm3-new-311", "zhiqing");
+                pipeMessage.Properties.Add("C# module 3", "This property is added from C# module 3");
                 await deviceClient.SendEventAsync("output1", pipeMessage);
                 Console.WriteLine("Received message sent");
             }

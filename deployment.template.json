@@ -68,6 +68,16 @@
               "image": "${MODULES.filtermodule3.amd64}",
               "createOptions": ""
             }
+          },
+          "functionmodule": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.functionmodule.amd64}",
+              "createOptions": ""
+            }
           }
         }
       }
@@ -77,9 +87,10 @@
         "schemaVersion": "1.0",
         "routes": {
           "sensorToFilter1": "FROM /messages/modules/temp-sensor-module/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/filtermodule/inputs/input1\")",
-          "fitler2": "FROM /messages/modules/filtermodule/outputs/output1 INTO BrokeredEndpoint(\"/modules/filtermodule2/inputs/input1\")",
-          "fitler3": "FROM /messages/modules/filtermodule2/outputs/output1 INTO BrokeredEndpoint(\"/modules/filtermodule3/inputs/input1\")",
-          "filterToIoTHub": "FROM /messages/modules/filtermodule3/outputs/output1 INTO $upstream"
+          "filter2": "FROM /messages/modules/filtermodule/outputs/output1 INTO BrokeredEndpoint(\"/modules/filtermodule2/inputs/input1\")",
+          "filter3": "FROM /messages/modules/filtermodule2/outputs/output1 INTO BrokeredEndpoint(\"/modules/filtermodule3/inputs/input1\")",
+          "filterfunction": "FROM /messages/modules/filtermodule3/outputs/output1 INTO BrokeredEndpoint(\"/modules/functionmodule/inputs/input1\")",
+          "filterToIoTHub": "FROM /messages/modules/functionmodule/outputs/output1 INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
