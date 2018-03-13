@@ -1,0 +1,15 @@
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\obj\Debug\netcoreapp2.0\filtermodule.test.csproj.CoreCompileInputs.cache
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\obj\Debug\netcoreapp2.0\filtermodule.test.AssemblyInfoInputs.cache
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\obj\Debug\netcoreapp2.0\filtermodule.test.AssemblyInfo.cs
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\bin\Debug\netcoreapp2.0\xunit.runner.visualstudio.dotnetcore.testadapter.dll
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\bin\Debug\netcoreapp2.0\xunit.runner.utility.netstandard15.dll
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\bin\Debug\netcoreapp2.0\xunit.runner.reporters.netstandard15.dll
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\bin\Debug\netcoreapp2.0\filtermodule.test.deps.json
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\bin\Debug\netcoreapp2.0\filtermodule.test.runtimeconfig.json
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\bin\Debug\netcoreapp2.0\filtermodule.test.runtimeconfig.dev.json
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\bin\Debug\netcoreapp2.0\filtermodule.test.dll
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\bin\Debug\netcoreapp2.0\filtermodule.test.pdb
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\bin\Debug\netcoreapp2.0\filtermodule.dll
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\bin\Debug\netcoreapp2.0\filtermodule.pdb
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\obj\Debug\netcoreapp2.0\filtermodule.test.dll
+C:\Users\v-zhq\iot\edge\newsolution\edge-multi-module\modules\filtermodule.test\obj\Debug\netcoreapp2.0\filtermodule.test.pdb
