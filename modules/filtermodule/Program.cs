@@ -11,7 +11,7 @@ namespace filtermodule
     using Microsoft.Azure.Devices.Client;
     using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 
-    class Program
+    public class Program
     {
         static int counter;
 
@@ -115,15 +115,20 @@ namespace filtermodule
             if (!string.IsNullOrEmpty(messageString))
             {
                 var pipeMessage = new Message(messageBytes);
-                foreach (var prop in message.Properties)
-                {
-                    pipeMessage.Properties.Add(prop.Key, prop.Value);
-                }
+                CopyProperties(message, pipeMessage);
                 pipeMessage.Properties.Add("C# module 1", "This property is added from C# module 1");
                 await deviceClient.SendEventAsync("output1", pipeMessage);
                 Console.WriteLine("Received message sent");
             }
             return MessageResponse.Completed;
+        }
+
+        public static void CopyProperties(Message from, Message to) 
+        {
+          foreach (var prop in from.Properties)
+          {
+            to.Properties.Add(prop.Key, prop.Value);
+          }
         }
     }
 }
