@@ -10,10 +10,30 @@ namespace filtermodule
     using System.Threading.Tasks;
     using Microsoft.Azure.Devices.Client;
     using Microsoft.Azure.Devices.Client.Transport.Mqtt;
+    using System.Collections.Generic;     // for KeyValuePair<>
+    using Microsoft.Azure.Devices.Shared; // for TwinCollection
+    using Newtonsoft.Json;                // for JsonConvert
+
+    public class MessageBody
+    {
+        public Machine machine { get; set; }
+        public Ambient ambient { get; set; }
+        public string timeCreated { get; set; }
+    }
+    public class Machine
+    {
+        public double temperature { get; set; }
+        public double pressure { get; set; }
+    }
+    public class Ambient
+    {
+        public double temperature { get; set; }
+        public int humidity { get; set; }
+    }
 
     public class Program
     {
-        static int counter;
+        public static int temperatureThreshold { get; set; } = 25;
 
         static void Main(string[] args)
         {
@@ -90,45 +110,80 @@ namespace filtermodule
             Console.WriteLine("IoT Hub module client initialized.");
 
             // Register callback to be called when a message is received by the module
-            await ioTHubModuleClient.SetInputMessageHandlerAsync("input1", PipeMessage, ioTHubModuleClient);
+            await ioTHubModuleClient.SetInputMessageHandlerAsync("input1", FilterMessages, ioTHubModuleClient);
         }
 
         /// <summary>
         /// This method is called whenever the module is sent a message from the EdgeHub. 
-        /// It just pipe the messages without any change.
+        /// It filters the message.
         /// It prints all the incoming messages.
         /// </summary>
-        static async Task<MessageResponse> PipeMessage(Message message, object userContext)
+        static async Task<MessageResponse> FilterMessages(Message message, object userContext)
         {
-            int counterValue = Interlocked.Increment(ref counter);
-
-            var deviceClient = userContext as DeviceClient;
-            if (deviceClient == null)
+            try
             {
-                throw new InvalidOperationException("UserContext doesn't contain " + "expected values");
+                DeviceClient deviceClient = (DeviceClient)userContext;
+
+                var filteredMessage = filter(message);
+                if (filteredMessage != null)
+                {
+                    await deviceClient.SendEventAsync("output1", filteredMessage);
+                }
+
+                // Indicate that the message treatment is completed
+                return MessageResponse.Completed;
             }
-
-            byte[] messageBytes = message.GetBytes();
-            string messageString = Encoding.UTF8.GetString(messageBytes);
-            Console.WriteLine($"Received message: {counterValue}, Body: [{messageString}]");
-
-            if (!string.IsNullOrEmpty(messageString))
+            catch (AggregateException ex)
             {
-                var pipeMessage = new Message(messageBytes);
-                CopyProperties(message, pipeMessage);
-                pipeMessage.Properties.Add("C# module 1", "This property is added from C# module 1");
-                await deviceClient.SendEventAsync("output1", pipeMessage);
-                Console.WriteLine("Received message sent");
+                foreach (Exception exception in ex.InnerExceptions)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Error in sample: {0}", exception);
+                }
+                // Indicate that the message treatment is not completed
+                var deviceClient = (DeviceClient)userContext;
+                return MessageResponse.Abandoned;
             }
-            return MessageResponse.Completed;
+            catch (Exception ex)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Error in sample: {0}", ex.Message);
+                // Indicate that the message treatment is not completed
+                DeviceClient deviceClient = (DeviceClient)userContext;
+                return MessageResponse.Abandoned;
+            }
         }
 
-        public static void CopyProperties(Message from, Message to) 
+        public static Message filter(Message message)
         {
-          foreach (var prop in from.Properties)
-          {
-            to.Properties.Add(prop.Key, prop.Value);
-          }
+            var messageBytes = message.GetBytes();
+            var messageString = Encoding.UTF8.GetString(messageBytes);
+
+            // Get message body
+            var messageBody = JsonConvert.DeserializeObject<MessageBody>(messageString);
+
+            if (messageBody != null && messageBody.machine.temperature > temperatureThreshold)
+            {
+                Console.WriteLine($"Machine temperature {messageBody.machine.temperature} " +
+                    $"exceeds threshold {temperatureThreshold}");
+                var filteredMessage = new Message(messageBytes);
+                foreach (KeyValuePair<string, string> prop in message.Properties)
+                {
+                    filteredMessage.Properties.Add(prop.Key, prop.Value);
+                }
+
+                filteredMessage.Properties.Add("MessageType", "Alert");
+                return filteredMessage;
+            }
+            return null;
+        }
+
+        public static void CopyProperties(Message from, Message to)
+        {
+            foreach (var prop in from.Properties)
+            {
+                to.Properties.Add(prop.Key, prop.Value);
+            }
         }
     }
 }
