@@ -16,6 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\modules\filtermodule\filtermodule.csproj" />
+    <ProjectReference Include="..\..\modules\FilterModule\FilterModule.csproj" />
   </ItemGroup>
 </Project>

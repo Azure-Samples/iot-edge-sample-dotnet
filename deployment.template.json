@@ -39,13 +39,13 @@
               "createOptions": ""
             }
           },
-          "filtermodule": {
+          "FilterModule": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.filtermodule.amd64}",
+              "image": "${MODULES.FilterModule.amd64}",
               "createOptions": ""
             }
           }
@@ -56,8 +56,8 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "sensorToFilter1": "FROM /messages/modules/temp-sensor-module/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/filtermodule/inputs/input1\")",
-          "filter2": "FROM /messages/modules/filtermodule/outputs/output1 INTO $upstream"
+          "sensorToFilter1": "FROM /messages/modules/temp-sensor-module/outputs/temperatureOutput INTO BrokeredEndpoint(\"/modules/FilterModule/inputs/input1\")",
+          "filter2": "FROM /messages/modules/FilterModule/outputs/output1 INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
