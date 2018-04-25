@@ -1,4 +1,4 @@
-namespace filtermodule
+namespace FilterModule
 {
     using System;
     using System.IO;
@@ -33,7 +33,8 @@ namespace filtermodule
 
     public class Program
     {
-        public static int temperatureThreshold { get; set; } = 25;
+        static int counter;
+        static int temperatureThreshold { get; set; } = 25;
 
         static void Main(string[] args)
         {
@@ -110,14 +111,77 @@ namespace filtermodule
             Console.WriteLine("IoT Hub module client initialized.");
 
             // Register callback to be called when a message is received by the module
+            // await ioTHubModuleClient.SetImputMessageHandlerAsync("input1", PipeMessage, iotHubModuleClient);
+
+            // Read TemperatureThreshold from Module Twin Desired Properties
+            var moduleTwin = await ioTHubModuleClient.GetTwinAsync();
+            var moduleTwinCollection = moduleTwin.Properties.Desired;
+            if (moduleTwinCollection["TemperatureThreshold"] != null)
+            {
+                temperatureThreshold = moduleTwinCollection["TemperatureThreshold"];
+            }
+
+            // Attach callback for Twin desired properties updates
+            await ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(onDesiredPropertiesUpdate, null);
+
+            // Register callback to be called when a message is received by the module
             await ioTHubModuleClient.SetInputMessageHandlerAsync("input1", FilterMessages, ioTHubModuleClient);
         }
 
-        /// <summary>
-        /// This method is called whenever the module is sent a message from the EdgeHub. 
-        /// It filters the message.
-        /// It prints all the incoming messages.
-        /// </summary>
+        static Task onDesiredPropertiesUpdate(TwinCollection desiredProperties, object userContext)
+        {
+            try
+            {
+                Console.WriteLine("Desired property change:");
+                Console.WriteLine(JsonConvert.SerializeObject(desiredProperties));
+
+                if (desiredProperties["TemperatureThreshold"] != null)
+                    temperatureThreshold = desiredProperties["TemperatureThreshold"];
+
+            }
+            catch (AggregateException ex)
+            {
+                foreach (Exception exception in ex.InnerExceptions)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Error when receiving desired property: {0}", exception);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Error when receiving desired property: {0}", ex.Message);
+            }
+            return Task.CompletedTask;
+        }
+
+        public static Message filter(Message message)
+        {
+            var counterValue = Interlocked.Increment(ref counter);
+
+            var messageBytes = message.GetBytes();
+            var messageString = Encoding.UTF8.GetString(messageBytes);
+            Console.WriteLine($"Received message {counterValue}: [{messageString}]");
+
+            // Get message body
+            var messageBody = JsonConvert.DeserializeObject<MessageBody>(messageString);
+
+            if (messageBody != null && messageBody.machine.temperature > temperatureThreshold)
+            {
+                Console.WriteLine($"Machine temperature {messageBody.machine.temperature} " +
+                    $"exceeds threshold {temperatureThreshold}");
+                var filteredMessage = new Message(messageBytes);
+                foreach (KeyValuePair<string, string> prop in message.Properties)
+                {
+                    filteredMessage.Properties.Add(prop.Key, prop.Value);
+                }
+
+                filteredMessage.Properties.Add("MessageType", "Alert");
+                return filteredMessage;
+            }
+            return null;
+        }
+
         static async Task<MessageResponse> FilterMessages(Message message, object userContext)
         {
             try
@@ -151,38 +215,6 @@ namespace filtermodule
                 // Indicate that the message treatment is not completed
                 DeviceClient deviceClient = (DeviceClient)userContext;
                 return MessageResponse.Abandoned;
-            }
-        }
-
-        public static Message filter(Message message)
-        {
-            var messageBytes = message.GetBytes();
-            var messageString = Encoding.UTF8.GetString(messageBytes);
-
-            // Get message body
-            var messageBody = JsonConvert.DeserializeObject<MessageBody>(messageString);
-
-            if (messageBody != null && messageBody.machine.temperature > temperatureThreshold)
-            {
-                Console.WriteLine($"Machine temperature {messageBody.machine.temperature} " +
-                    $"exceeds threshold {temperatureThreshold}");
-                var filteredMessage = new Message(messageBytes);
-                foreach (KeyValuePair<string, string> prop in message.Properties)
-                {
-                    filteredMessage.Properties.Add(prop.Key, prop.Value);
-                }
-
-                filteredMessage.Properties.Add("MessageType", "Alert");
-                return filteredMessage;
-            }
-            return null;
-        }
-
-        public static void CopyProperties(Message from, Message to)
-        {
-            foreach (var prop in from.Properties)
-            {
-                to.Properties.Add(prop.Key, prop.Value);
             }
         }
     }

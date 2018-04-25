@@ -1,6 +1,5 @@
 using Xunit;
-using filtermodule;
-using Moq;
+using FilterModule;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -15,24 +14,12 @@ using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 
 namespace filtermodule.Test
 {
-    using Microsoft.Azure.Devices.Client;
-
     public class ProgramUnitTest
     {
         [Fact]
-        public void copyPropertyTest()
-        {
-            var source = new Message();
-            var target = new Message();
-            source.Properties.Add("test", "value");
-            Program.CopyProperties(source, target);
-            Assert.True(target.Properties.ContainsKey("test"));
-        }
-
-        [Fact]
         public void filterLessThanThresholdTest()
         {
-            var source = createMessage(Program.temperatureThreshold-1);
+            var source = createMessage(25-1);
             var result = Program.filter(source);
             Assert.True(result==null);
         }
@@ -40,7 +27,7 @@ namespace filtermodule.Test
         [Fact]
         public void filterMoreThanThresholdAlertPropertyTest()
         {
-            var source = createMessage(Program.temperatureThreshold + 1);
+            var source = createMessage(25 + 1);
             var result = Program.filter(source);
             Assert.True(result.Properties["MessageType"] == "Alert");
         }
@@ -48,7 +35,7 @@ namespace filtermodule.Test
         [Fact]
         public void filterMoreThanThresholdCopyPropertyTest()
         {
-            var source = createMessage(Program.temperatureThreshold + 1);
+            var source = createMessage(25 + 1);
             source.Properties.Add("customTestKey", "customTestValue");
             var result = Program.filter(source);
             Assert.True(result.Properties["customTestKey"] == "customTestValue");
