@@ -19,7 +19,7 @@ namespace filtermodule.Test
         [Fact]
         public void filterLessThanThresholdTest()
         {
-            var source = createMessage(25-1);
+            var source = createMessage(25 - 1);
             var result = Program.filter(source);
             Assert.True(result==null);
         }
