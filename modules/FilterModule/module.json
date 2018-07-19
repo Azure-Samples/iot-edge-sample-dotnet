@@ -2,7 +2,7 @@
     "$schema-version": "0.0.1",
     "description": "",
     "image": {
-        "repository": "michaeljqzq/jjj",
+        "repository": "zhiqing.azurecr.io/xxx",
         "tag": {
             "version": "0.0.1",
             "platforms": {
