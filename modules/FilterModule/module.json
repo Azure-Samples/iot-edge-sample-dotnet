@@ -2,7 +2,7 @@
     "$schema-version": "0.0.1",
     "description": "",
     "image": {
-        "repository": "michaeljqzq/jenkins-test-master",
+        "repository": "zhiqing.azurecr.io/jenkins-test-master",
         "tag": {
             "version": "0.0.1",
             "platforms": {
