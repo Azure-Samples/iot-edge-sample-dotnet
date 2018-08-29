@@ -7,7 +7,14 @@
           "type": "docker",
           "settings": {
             "minDockerVersion": "v1.25",
-            "loggingOptions": ""
+            "loggingOptions": "",
+            "registryCredentials": {
+              "YourACR": {
+                "username": "${ACR_USER}",
+                "password": "${ACR_PASS}",
+                "address": "${ACR_SERVER}"
+              }
+            }
           }
         },
         "systemModules": {
