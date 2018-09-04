@@ -70,12 +70,6 @@
           "timeToLiveSecs": 7200
         }
       }
-    },
-    "SampleModule": {
-      "properties.desired": {
-        "schemaVersion": "1.0",
-        "TemperatureThreshold": 21
-      }
     }
   }
 }
